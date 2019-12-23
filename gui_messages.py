@@ -19,7 +19,5 @@ def greet_user(name,f):
     greet_message.pack(pady=32)
     close_button = tk.Button(popup, text="        Close        ", command=popup.destroy)
     close_button.pack()
-    popup.after(5000, lambda: popup.destroy())
+    popup.after(2000, lambda: popup.destroy())
     tk.mainloop()
-
-greet_user('ketan',0)

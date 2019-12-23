@@ -3,12 +3,13 @@ import numpy as np
 import os, time, requests
 from threading import Thread
 import gui_messages as window
+import routine_backup as bkp
 
 already = []
 already_time = []
 out_time = []
 left_for_today = []
-
+already,already_time,out_time,left_for_today = bkp.restore_lists(already,already_time,out_time,left_for_today)
 def printstatus(a):
     if(a.startswith('2')):
         print("Data Sent Successfully")
@@ -31,7 +32,7 @@ def resolvetime(t):
     if(mi>=45):
         mi=mi-45
         if mi <10:
-            mi = int('0'+mi)
+            mi = int('0{}'.format(mi))
         hr = hr + 1
         strtime = str(hr)+'.'+str(mi)
         return(float(strtime))
@@ -89,6 +90,7 @@ while True:
                 t=time.time()           
                 already=timecheckcall(t,already)                     
                 if name not in already:
+                    bkp.backup_lists(already,already_time,out_time,left_for_today)
                     Thread(target=window.greet_user, args=(name,0,)).start()
                     t=time.time()
                     r=requests.post("http://833a3270.ngrok.io/updateattend/{}/{}".format(name,t))
@@ -99,6 +101,7 @@ while True:
                     time_in = float(time.strftime("%H.%M", time.localtime(t)))
                     already_time.append(time_in)
                     out_time.append(resolvetime(time_in))
+                    bkp.backup_lists(already,already_time,out_time,left_for_today)
                     print(already)
                 else:
 
@@ -122,7 +125,8 @@ while True:
     cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1 ) & 0xFF == ord('q'):
+        bkp.backup_lists([],[],[],[])
         break
 video_capture.release()
 cv2.destroyAllWindows()
